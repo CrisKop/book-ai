@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generador de Imágenes</title>
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <script src="./FileSaver.min.js"></script>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+      color: white;
+    }
+
+    body {
+        font-family: 'Book Antiqua', Palatino, 'Palatino Linotype', 'Palatino LT STD', 'Georgia', serif;
+      min-height: 100vh;
+      background-color: #272c3a;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+      padding: 20px;
+    }
+
+    #imageForm {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 30px;
+      background: #1e222c;
+      border-radius: 30px;
+    }
+
+    #imageForm div{
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    input{
+        color: gray;
+    }
+
+    textarea{
+        background: #bdbdbd;
+        color: black;
+        font-weight: bold;
+    }
+
+    button{
+        background-color: #29334b;
+        padding: 10px;
+        color: white;
+        border-radius: 10px;
+        font-weight: bold;
+        cursor: pointer;
+        border: 2px solid black;
+        font-size: 20px;
+    }
+
+    button:hover{
+        border: 2px solid white;
+    }
+
+    #imageContainer {
+      position: relative;
+      width: 2160px;
+      height: 2160px;
+      overflow: hidden;
+    }
+
+    #userImage {
+      width: 2160px;
+      height: 2160px;
+    position: absolute;
+
+    }
+
+    #overlayImage {
+      position: absolute;
+      height: 2160px;
+      z-index: 1;
+      
+     /* display: none;  inicialmente oculto */
+    }
+
+    #userText {
+      font-size: 15px;
+white-space: pre-wrap;
+      text-align: center;
+      width: 25vw;
+      height: 150px;
+    }
+
+    #pageText{
+      color: rgba(7, 7, 7, 0.479);
+      font-size: 1.7rem;
+      position: absolute;
+      bottom: 25px;
+    }
+
+    .resulttext{
+        position: absolute;
+
+      text-align:left;
+      width: 1000px !important;
+      transform: translateX(43%) translateY(15%) rotate(0.5deg);
+      height: 1680px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: transparent;
+      z-index: 2;
+      top: 0%;
+    }
+
+    #resultText{
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        max-width: 980px;
+        white-space: pre-wrap;
+        font-size: 40px;
+        /*font-size: 20px;*/
+         /*font-size: 35px;*/
+        color: black !important;
+    }
+
+    #resultText b{
+      background: #f5f83e65;
+      color: black;
+      font-weight: 100;
+    }
+
+    #titleText{
+      word-wrap: break-word;
+        overflow-wrap: break-word;
+        max-width: 980px;
+        white-space: pre-wrap;
+        font-size: 30px;
+        /*font-size: 20px;*/
+         /*font-size: 35px;*/
+        color: black !important;
+        text-align: center;
+        margin-bottom: 80px;
+    }
+
+    label{
+        color: white;
+    }
+
+    h4{
+      color: rgba(0, 0, 0, 0.25);
+      font-style: italic;
+      font-size: 36px;
+      margin-top: 80px;
+    }
+
+    .checkbox{
+      text-align: center;
+    }
+  </style>
+</head>
+
+
+<body>
+  <form id="imageForm">
+    <div>
+    <label for="backgroundImage">Selecciona un fondo:</label>
+    <input type="file" id="backgroundImage" accept="image/*">
+
+    <div>
+      <label for="userTitle">Escribe un titulo:</label>
+       <textarea id="userTitle" placeholder="Título"></textarea>
+    </div>  
+
+    <div>
+      <label for="userPage">Página:</label>
+       <textarea id="userPage" placeholder=""></textarea>
+    </div>  
+</div>
+
+<div>
+    <label for="userText">Escribe un texto:</label>
+     <textarea id="userText" placeholder="Tu texto aquí"></textarea>
+
+     <input type="checkbox" id="checkbox"> <label for="checkbox" class="checkbox">Top</label>
+     <input type="checkbox" id="onlytext"> <label for="onlytext" class="checkbox">Only text</label>
+     <input type="checkbox" id="sepia"> <label for="sepia" class="checkbox">Sepia</label>
+     <input type="checkbox" id="watermark"> <label for="watermark" class="checkbox">Quitar marca de agua</label>
+     <input type="checkbox" id="watermarkchange"> <label for="watermarkchange" class="checkbox">Cambiar marca de agua</label>
+     <input type="checkbox" id="textcenter"> <label for="textcenter" class="checkbox">Centrar texto</label>
+</div>  
+
+</form>
+
+<div class="buttons">
+    <button type="button" onclick="generateImage()">Generar Imagen</button>
+</div>
+
+    <h1>Resultado:</h1>
+
+    <button onclick="descargarImagen()">Descargar como PNG</button>
+
+  <div id="imageContainer">
+    <img id="userImage" src="./fondo.png"" alt="Fondo de usuario">
+    <img id="overlayImage" src="./4.png" alt="Imagen predefinida">
+    <div class="resulttext">
+      <p id="titleText">Título</p>
+        <p id="resultText">Esta es una previsualizacion de como se vería el texto en el resultado despues de pegarlo</p>
+        <br><br>
+        <h4 id="watermarktext">Cristian Prince</h4>
+        <h5 id="pageText">1</h5>
+    </div>
+  </div>
+
+  <script>
+    function generateImage() {
+      const backgroundImageInput = document.getElementById('backgroundImage');
+      const userImage = document.getElementById('userImage');
+      const overlayImage = document.getElementById('overlayImage');
+      const userText = document.getElementById('userText');
+      const userTitle = document.getElementById('userTitle');
+      const resultText = document.getElementById('resultText')
+      const titleText = document.getElementById('titleText')
+      const pageText = document.getElementById('pageText')
+      const userPage = document.getElementById('userPage')
+      console.log(userText.value)
+
+
+      const file = backgroundImageInput.files[0];
+      const reader = new FileReader();
+
+      function replaceAngleBrackets(text) {
+    let newText = '';
+    let inBracket = false;
+    for (let char of text) {
+      if (char === '{') {
+        inBracket = true;
+        newText += '<b>';
+      } else if (char === '}') {
+        inBracket = false;
+        newText += '</b>';
+      } else {
+        newText += char;
+      }
+    }
+    return newText;
+  }
+
+
+      reader.onload = function (e) {
+        resultText.innerHTML = replaceAngleBrackets(userText.value);
+        titleText.innerHTML = userTitle.value;
+        pageText.innerHTML = userPage.value
+        userImage.src = e.target.result;
+      };
+
+      reader.readAsDataURL(file);
+
+
+
+    }
+
+    document.getElementById('textcenter').addEventListener('change', function() {
+      var resultText = document.getElementById('resultText');
+      resultText.style.textAlign = this.checked ? "center" : "left";
+    })
+
+    document.getElementById('sepia').addEventListener('change', function() {
+      var overlayImage = document.getElementById('overlayImage');
+      var userImage = document.getElementById('userImage');
+      overlayImage.style.filter = this.checked ? "sepia(1) saturate(1)" : "none";
+      userImage.style.filter = this.checked ? "sepia(1) saturate(1)" : "none";
+    })
+
+    document.getElementById('watermark').addEventListener('change', function() {
+      var watermarkText = document.getElementById('watermarktext');
+      watermarkText.style.display = this.checked ? "none" : "flex";
+    })
+
+
+    document.getElementById('watermarkchange').addEventListener('change', function() {
+      var watermarkText = document.getElementById('watermarktext');
+      watermarkText.textContent = this.checked ? "Andy Tarriba" : "Cristian Prince";
+    })
+
+    document.getElementById('checkbox').addEventListener('change', function() {
+      var resultText = document.querySelector('.resulttext');
+      resultText.style.top = this.checked ? '-30%' : '0%';
+    });
+
+
+    document.getElementById('onlytext').addEventListener('change', function() {
+      const userImage = document.getElementById('userImage');
+      const overlayImage = document.getElementById('overlayImage');
+
+
+      userImage.style.display = this.checked ? "none" : "block";
+      overlayImage.style.display = this.checked ? "none" : "block";
+    });
+
+
+    function descargarImagen() {
+  const imageContainer = document.getElementById('imageContainer');
+
+  // Verificar si el contenedor de la imagen está presente
+  if (imageContainer) {
+    html2canvas(imageContainer).then(function(canvas) {
+      if (canvas.width > 0 && canvas.height > 0) {
+        canvas.toBlob(function(blob) {
+          saveAs(blob, 'a.png');
+        }, 'image/png');
+      } else {
+        console.error('El canvas está vacío. No se puede descargar la imagen.');
+      }
+    });
+  } else {
+    console.error('No se encontró el contenedor de la imagen.');
+  }
+}
+  </script>
+
+
+
+
+
+
+  
+</body>
+</html>
